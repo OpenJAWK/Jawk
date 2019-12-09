@@ -99,6 +99,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 
 	private final AwkSettings settings;
 
+	private final PrintStream outStream;
+
 	/**
 	 * Construct the interpreter.
 	 * <p>
@@ -115,6 +117,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		trap_illegal_format_exceptions = false;
 		jrt = new JRT(this);	// this = VariableManager
 		this.extensions = Collections.emptyMap();
+		outStream = null;
 	}
 
 	/**
@@ -138,6 +141,11 @@ public class AVM implements AwkInterpreter, VariableManager {
 		this.extensions = extensions;
 		for (JawkExtension ext : extensions.values()) {
 			ext.init(this, jrt, settings);	// this = VariableManager
+		}
+		if (settings.getOutput() instanceof PrintStream) {
+			outStream = (PrintStream) settings.getOutput();
+		} else {
+			outStream = new PrintStream(settings.getOutput());
 		}
 	}
 
@@ -274,7 +282,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = item 2
 						// etc.
 						int num_args = position.intArg(0);
-						printTo(System.out, num_args);
+						printTo(outStream, num_args);
 						position.next();
 						break;
 					}
@@ -319,7 +327,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = item 1
 						// etc.
 						int num_args = position.intArg(0);
-						printfTo(System.out, num_args);
+						printfTo(outStream, num_args);
 						position.next();
 						break;
 					}

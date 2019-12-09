@@ -1,6 +1,7 @@
 package org.jawk.util;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,12 @@ public class AwkSettings {
 	 * By default, this is {@link System#in}.
 	 */
 	private InputStream input = System.in;
+
+	/**
+	 * Where output is written to.
+	 * By default, this is {@link System#out}.
+	 */
+	private OutputStream output = System.out;
 
 	/**
 	 * Contains variable assignments which are applied prior to
@@ -273,6 +280,24 @@ public class AwkSettings {
 	 */
 	public void setInput(InputStream input) {
 		this.input = input;
+	}
+
+	/**
+	 * Where output is written to.
+	 * By default, this is {@link System#out}.
+	 * @return the output
+	 */
+	public OutputStream getOutput() {
+		return output;
+	}
+
+	/**
+	 * Where output is written to.
+	 * By default, this is {@link System#out}.
+	 * @param output the output to set
+	 */
+	public void setOutput(OutputStream output) {
+		this.output = output;
 	}
 
 	/**
