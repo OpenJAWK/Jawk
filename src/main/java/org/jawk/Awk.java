@@ -21,6 +21,7 @@ import org.jawk.backend.AwkCompiler;
 import org.jawk.ext.JawkExtension;
 import org.jawk.frontend.AwkParser;
 import org.jawk.frontend.AwkSyntaxTree;
+import org.jawk.intermediate.AwkIntermediateCompiler;
 import org.jawk.intermediate.AwkTuples;
 import org.jawk.util.AwkSettings;
 import org.jawk.util.DestDirClassLoader;
@@ -140,44 +141,26 @@ public class Awk {
 				}
 			}
 			if (!notIntermediateScriptSources.isEmpty()) {
-				AwkParser parser = new AwkParser(
+				AwkIntermediateCompiler intermediateCompiler = new AwkIntermediateCompiler(
+						extensions,
 						settings.isAdditionalFunctions(),
 						settings.isAdditionalTypeFunctions(),
-						settings.isUseStdIn(),
-						extensions);
-				// parse the script
-				AwkSyntaxTree ast = parser.parse(notIntermediateScriptSources);
+						settings.isUseStdIn());
 
 				if (settings.isDumpSyntaxTree()) {
 					// dump the syntax tree of the script to a file
 					String filename = settings.getOutputFilename("syntax_tree.lst");
 					LOG.info("writing to '{}'", filename);
 					PrintStream ps = new PrintStream(new FileOutputStream(filename));
+					AwkSyntaxTree ast = intermediateCompiler.parseAst(notIntermediateScriptSources);
 					if (ast != null) {
 						ast.dump(ps);
 					}
 					ps.close();
 					return;
 				}
-				// otherwise, attempt to traverse the syntax tree and build
-				// the intermediate code
-				if (ast != null) {
-					// 1st pass to tie actual parameters to back-referenced formal parameters
-					ast.semanticAnalysis();
-					// 2nd pass to tie actual parameters to forward-referenced formal parameters
-					ast.semanticAnalysis();
-					// build tuples
-					int result = ast.populateTuples(tuples);
-					// ASSERTION: NOTHING should be left on the operand stack ...
-					assert result == 0;
-					// Assign queue.next to the next element in the queue.
-					// Calls touch(...) per Tuple so that addresses can be normalized/assigned/allocated
-					tuples.postProcess();
-					// record global_var -> offset mapping into the tuples
-					// so that the interpreter/compiler can assign variables
-					// on the "file list input" command line
-					parser.populateGlobalVariableNameToOffsetMappings(tuples);
-				}
+
+				tuples = intermediateCompiler.compile(notIntermediateScriptSources);
 				if (settings.isWriteIntermediateFile()) {
 					// dump the intermediate code to an intermediate code file
 					String filename = settings.getOutputFilename("a.ai");

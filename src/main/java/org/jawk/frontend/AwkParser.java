@@ -324,10 +324,10 @@ public class AwkParser {
 	 * @throws IOException upon an IO error.
 	 */
 	public AwkSyntaxTree parse(List<ScriptSource> scriptSources)
-			throws IOException
-	{
+			throws IllegalArgumentException, IOException {
+
 		if ((scriptSources == null) || scriptSources.isEmpty()) {
-			throw new IOException("No script sources supplied");
+			throw new IllegalArgumentException("No script sources supplied");
 		}
 		this.scriptSources = scriptSources;
 		scriptSourcesCurrentIndex = 0;
