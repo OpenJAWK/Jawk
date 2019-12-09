@@ -1,5 +1,7 @@
 # Jawk - ReadMe
 
+[![Build Status](https://travis-ci.com/OpenJAWK/Jawk.svg?branch=master)](https://travis-ci.com/OpenJAWK/Jawk)
+
 ## Intro
 
 JAWK is a pure Java distribution of [AWK](https://en.wikipedia.org/wiki/AWK).
